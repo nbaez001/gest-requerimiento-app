@@ -47,7 +47,7 @@ public class RequerimientoController {
 
 	@PutMapping(value = "/{id}")
 	public OutResponse<Requerimiento> modificar(@RequestBody Requerimiento req,
-			@PathVariable(name = "id", required = true) Long id) {
+			@PathVariable(name = "id", required = true) Integer id) {
 		log.info("[MODIFICAR REQUERIMIENTO][CONTROLLER][INICIO]");
 		OutResponse<Requerimiento> out = requerimientoService.modificar(req, id);
 		log.info("[MODIFICAR REQUERIMIENTO][CONTROLLER][FIN]");
@@ -55,7 +55,7 @@ public class RequerimientoController {
 	}
 
 	@DeleteMapping(value = "/{id}")
-	public OutResponse<?> eliminar(@PathVariable(name = "id", required = false) Long id) {
+	public OutResponse<?> eliminar(@PathVariable(name = "id", required = false) Integer id) {
 		log.info("[ELIMINAR REQUERIMIENTO][CONTROLLER][INICIO]");
 		OutResponse<?> out = requerimientoService.eliminar(id);
 		log.info("[ELIMINAR REQUERIMIENTO][CONTROLLER][FIN]");

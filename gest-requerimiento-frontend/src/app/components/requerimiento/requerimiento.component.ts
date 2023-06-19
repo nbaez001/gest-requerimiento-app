@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { CONSTANTES } from 'src/app/common';
@@ -15,11 +15,22 @@ import { RequerimientoService } from 'src/app/services/requerimiento.service';
   styleUrls: ['./requerimiento.component.scss']
 })
 export class RequerimientoComponent implements OnInit {
-  listaArea: Subject<Area[]> = new Subject<Area[]>();
-  listaRequerimiento: Subject<Requerimiento[]> = new Subject<Requerimiento[]>();
+  @ViewChild('closebutton') closebutton;
+  @ViewChild('closebutton2') closebutton2;
+
+  listaArea: Area[] = [];
+  listaRequerimiento: Requerimiento[] = [];
 
   formularioBuscarGrp: FormGroup;
   formBuscarErrors: any
+
+  formularioRegistrarGrp: FormGroup;
+  formRegistrarErrors: any
+
+  formularioModificarGrp: FormGroup;
+  formModificarErrors: any
+
+  requerimientoMod: Requerimiento;
 
   constructor(
     private fb: FormBuilder,
@@ -40,6 +51,32 @@ export class RequerimientoComponent implements OnInit {
       this.validationService.getValidationErrors(this.formularioBuscarGrp, this.formBuscarErrors, false);
     });
 
+    this.formularioRegistrarGrp = this.fb.group({
+      nombre: ['', []],
+      apellidos: ['', []],
+      area: ['', []],
+      nomSolicitud: ['', []],
+      descSolicitud: ['', []],
+    });
+
+    this.formRegistrarErrors = this.validationService.buildFormErrors(this.formularioRegistrarGrp, this.formRegistrarErrors);
+    this.formularioRegistrarGrp.valueChanges.subscribe((val: any) => {
+      this.validationService.getValidationErrors(this.formularioRegistrarGrp, this.formRegistrarErrors, false);
+    });
+
+    this.formularioModificarGrp = this.fb.group({
+      nombre: ['', []],
+      apellidos: ['', []],
+      area: ['', []],
+      nomSolicitud: ['', []],
+      descSolicitud: ['', []],
+    });
+
+    this.formModificarErrors = this.validationService.buildFormErrors(this.formularioModificarGrp, this.formModificarErrors);
+    this.formularioModificarGrp.valueChanges.subscribe((val: any) => {
+      this.validationService.getValidationErrors(this.formularioModificarGrp, this.formModificarErrors, false);
+    });
+
     this.inicializarVariables();
   }
 
@@ -54,9 +91,9 @@ export class RequerimientoComponent implements OnInit {
       .subscribe(
         (data: OutResponse<Area[]>) => {
           if (data.rcodigo == CONSTANTES.R_COD_EXITO) {
-            this.listaArea.next(data.robjeto);
+            this.listaArea = data.robjeto;
           } else {
-            this.listaArea.next([]);
+            this.listaArea = [];
           }
         }, error => {
           console.error(error);
@@ -73,9 +110,95 @@ export class RequerimientoComponent implements OnInit {
       (data: OutResponse<Requerimiento[]>) => {
         console.log(data);
         if (data.rcodigo == 0) {
-          this.listaRequerimiento.next(data.robjeto);
+          this.listaRequerimiento = data.robjeto;
         } else {
-          this.listaRequerimiento.next([]);
+          this.listaRequerimiento = [];
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  guardar(): void {
+    let req = new Requerimiento();
+    req.nombre = this.formularioRegistrarGrp.get('nombre').value;
+    req.apellidos = this.formularioRegistrarGrp.get('apellidos').value;
+    req.idArea = this.formularioRegistrarGrp.get('area').value ? this.formularioRegistrarGrp.get('area').value.id : null;
+    req.nomSolicitud = this.formularioRegistrarGrp.get('nomSolicitud').value;
+    req.descSolicitud = this.formularioRegistrarGrp.get('descSolicitud').value;
+    req.flgActivo = 1;
+    req.urlAnexo = 'url';
+
+    this.requerimientoService.guardar(req).subscribe(
+      (data: OutResponse<Requerimiento>) => {
+        console.log(data);
+        if (data.rcodigo == 0) {
+          data.robjeto.nombreArea = this.formularioRegistrarGrp.get('area').value ? this.formularioRegistrarGrp.get('area').value.nombre : null;
+          this.listaRequerimiento.push(data.robjeto);
+
+          this.closebutton.nativeElement.click();
+        } else {
+          console.log(data.rmensaje);
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  eliminar(req: Requerimiento): void {
+    this.requerimientoService.eliminar(req.id).subscribe(
+      (data: OutResponse<Requerimiento>) => {
+        console.log(data);
+        if (data.rcodigo == 0) {
+          let index = this.listaRequerimiento.indexOf(req);
+          this.listaRequerimiento.splice(index, 1);
+        } else {
+          console.log(data.rmensaje);
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  modificarData(req: Requerimiento): void {
+    let finArea = this.listaArea.find(e => e.id == req.idArea);
+    this.formularioModificarGrp.get('nombre').setValue(req.nombre);
+    this.formularioModificarGrp.get('apellidos').setValue(req.apellidos);
+    this.formularioModificarGrp.get('area').setValue(finArea);
+    this.formularioModificarGrp.get('nomSolicitud').setValue(req.nomSolicitud);
+    this.formularioModificarGrp.get('descSolicitud').setValue(req.descSolicitud);
+
+    this.requerimientoMod = req;
+  }
+
+  modificar(): void {
+    let req = new Requerimiento();
+    req.nombre = this.formularioModificarGrp.get('nombre').value;
+    req.apellidos = this.formularioModificarGrp.get('apellidos').value;
+    req.idArea = this.formularioModificarGrp.get('area').value ? this.formularioModificarGrp.get('area').value.id : null;
+    req.nomSolicitud = this.formularioModificarGrp.get('nomSolicitud').value;
+    req.descSolicitud = this.formularioModificarGrp.get('descSolicitud').value;
+    req.flgActivo = 1;
+    req.urlAnexo = 'url';
+
+    this.requerimientoService.modificar(req, this.requerimientoMod.id).subscribe(
+      (data: OutResponse<Requerimiento>) => {
+        console.log(data);
+        if (data.rcodigo == 0) {
+          let index = this.listaRequerimiento.indexOf(this.requerimientoMod);
+
+          data.robjeto.nombreArea = this.formularioModificarGrp.get('area').value ? this.formularioModificarGrp.get('area').value.nombre : null;
+          this.listaRequerimiento.splice(index, 1, data.robjeto);
+
+          this.closebutton2.nativeElement.click();
+        } else {
+          console.log(data.rmensaje);
         }
       },
       error => {

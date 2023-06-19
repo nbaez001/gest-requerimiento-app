@@ -8,8 +8,9 @@ import lombok.Data;
 public class Requerimiento implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private Long id;
-	private Long idArea;
+	private Integer id;
+	private Integer idArea;
+	private String nombreArea;
 	private String nombre;
 	private String apellidos;
 	private String nomSolicitud;

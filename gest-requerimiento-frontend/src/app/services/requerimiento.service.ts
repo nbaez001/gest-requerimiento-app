@@ -19,10 +19,10 @@ export class RequerimientoService {
   }
 
   public modificar(req: Requerimiento, id: number): Observable<OutResponse<Requerimiento>> {
-    return this.http.put<OutResponse<Requerimiento>>(`${environment.gestReqBackendUrl}/requerimiento?id=${id}`, req);
+    return this.http.put<OutResponse<Requerimiento>>(`${environment.gestReqBackendUrl}/requerimiento/${id}`, req);
   }
 
   public eliminar(id: number): Observable<OutResponse<any>> {
-    return this.http.delete<OutResponse<any>>(`${environment.gestReqBackendUrl}/requerimiento?id=${id}`);
+    return this.http.delete<OutResponse<any>>(`${environment.gestReqBackendUrl}/requerimiento/${id}`);
   }
 }

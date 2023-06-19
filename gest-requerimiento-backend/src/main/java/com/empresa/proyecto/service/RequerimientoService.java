@@ -11,7 +11,7 @@ public interface RequerimientoService {
 
 	public OutResponse<Requerimiento> guardar(Requerimiento req);
 
-	public OutResponse<Requerimiento> modificar(Requerimiento req, Long id);
+	public OutResponse<Requerimiento> modificar(Requerimiento req, Integer id);
 
-	public OutResponse<?> eliminar(Long id);
+	public OutResponse<?> eliminar(Integer id);
 }

@@ -8,6 +8,7 @@
 		SELECT 
 		r.id as id, 
 		r.id_area as idArea, 
+		(select a.nombre from area a where a.id=r.id_area) as nombreArea,
 		r.nombre as nombre, 
 		r.apellidos as apellidos,
 		r.nom_solicitud as nomSolicitud, 
@@ -31,30 +32,6 @@
 		</where>
 	</select>
 	
-	<select id="guardar" resultType="java.lang.Long">
-		INSERT INTO requerimiento(
-		id_area, 
-		nombre, 
-		apellidos, 
-		nom_solicitud, 
-		desc_solicitud, 
-		url_anexo, 
-		flg_activo, 
-		id_usu_crea, 
-		fec_usu_crea)
-		VALUES(
-		#{idArea,jdbcType=INTEGER},
-		#{nombre,jdbcType=VARCHAR},
-		#{apellidos,jdbcType=VARCHAR},
-		#{nomSolicitud,jdbcType=VARCHAR},
-		#{descSolicitud,jdbcType=VARCHAR},
-		#{urlAnexo,jdbcType=VARCHAR},
-		1,
-		1,
-		now())
-		RETURNING id
-	</select>
-	
 	<update id="modificar">
 		UPDATE requerimiento SET
 		id_area = #{idArea,jdbcType=INTEGER},
@@ -62,7 +39,6 @@
 		apellidos = #{apellidos,jdbcType=VARCHAR},
 		nom_solicitud = #{nomSolicitud,jdbcType=VARCHAR},
 		desc_solicitud = #{descSolicitud,jdbcType=VARCHAR},
-		url_anexo = #{urlAnexo,jdbcType=VARCHAR},
 		flg_activo = 1,
 		id_usu_mod = 1,
 		fec_usu_mod = now()

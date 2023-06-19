@@ -36,9 +36,7 @@ public class RequerimientoServiceImpl implements RequerimientoService {
 		log.info("[REGISTRAR REQUERIMIENTO][SERVICE][INICIO]");
 		OutResponse<Requerimiento> out = new OutResponse<>();
 
-		Long res = requerimientoRepository.guardar(req.getIdArea(), req.getNombre(), req.getApellidos(),
-				req.getNomSolicitud(), req.getDescSolicitud(), "url");
-		req.setId(res);
+		requerimientoRepository.guardar(req);
 		out.setRobjeto(req);
 
 		log.info("[REGISTRAR REQUERIMIENTO][SERVICE][FIN]");
@@ -46,7 +44,7 @@ public class RequerimientoServiceImpl implements RequerimientoService {
 	}
 
 	@Override
-	public OutResponse<Requerimiento> modificar(Requerimiento req, Long id) {
+	public OutResponse<Requerimiento> modificar(Requerimiento req, Integer id) {
 		log.info("[MODIFICAR REQUERIMIENTO][SERVICE][INICIO]");
 		OutResponse<Requerimiento> out = new OutResponse<>();
 
@@ -60,7 +58,7 @@ public class RequerimientoServiceImpl implements RequerimientoService {
 	}
 
 	@Override
-	public OutResponse<?> eliminar(Long id) {
+	public OutResponse<?> eliminar(Integer id) {
 		log.info("[ELIMINAR REQUERIMIENTO][SERVICE][INICIO]");
 		OutResponse<Requerimiento> out = new OutResponse<>();
 

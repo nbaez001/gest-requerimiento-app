@@ -21,7 +21,7 @@
             </div>
 
             <div class="col-sm-12">
-                <button type="button" class="btn btn-primary mr-2">Buscar</button>
+                <button type="button" class="btn btn-primary mr-2" (click)="buscar()">Buscar</button>
 
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                     Nuevo
@@ -41,17 +41,23 @@
                 <th scope="col">Solicitud</th>
                 <th scope="col">Descripción</th>
                 <th scope="col">Anexo</th>
+                <th scope="col">Opcion</th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let req of listaRequerimiento| async; let i=index">
+            <tr *ngFor="let req of listaRequerimiento; let i=index">
                 <th scope="row">1</th>
-                <td>{{req.idArea}}</td>
+                <td>{{req.nombreArea}}</td>
                 <td>{{req.nombre}}</td>
                 <td>{{req.apellidos}}</td>
                 <td>{{req.nomSolicitud}}</td>
                 <td>{{req.descSolicitud}}</td>
                 <td>{{req.urlAnexo}}</td>
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm mr-1" (click)="eliminar(req)">Elim.</button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="modificarData(req)" data-toggle="modal"
+                        data-target="#exampleModal2">Modif.</button>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -63,30 +69,30 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Registrar requerimiento</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button #closebutton type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form [formGroup]="formularioRegistrarGrp">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="nombre">Nombre</label>
-                                <input type="text" class="form-control" id="nombre">
+                                <input formControlName="nombre" type="text" class="form-control" id="nombre">
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="apellidos">Apellidos</label>
-                                <input type="text" class="form-control" id="apellidos">
+                                <input formControlName="apellidos" type="text" class="form-control" id="apellidos">
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="area">Area</label>
-                                <select class="form-control">
-                                    <option [ngValue]="area" *ngFor="let area of listaArea | async">{{area.nombre}}
+                                <select formControlName="area" class="form-control" id="area">
+                                    <option [ngValue]="area" *ngFor="let area of listaArea">{{area.nombre}}
                                     </option>
                                 </select>
                             </div>
@@ -94,13 +100,15 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="nomSolicitud">Nombre solicitud</label>
-                                <input type="text" class="form-control" id="nomSolicitud">
+                                <input formControlName="nomSolicitud" type="text" class="form-control"
+                                    id="nomSolicitud">
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
                                 <label for="descSolicitud">Descripción solicitud</label>
-                                <input type="text" class="form-control" id="descSolicitud">
+                                <textarea formControlName="descSolicitud" class="form-control" id="descSolicitud"
+                                    rows="3"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -113,7 +121,65 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-primary" (click)="guardar()">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModal2Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModal2Label">Modificar requerimiento</h5>
+                <button #closebutton2 type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="formularioModificarGrp">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input formControlName="nombre" type="text" class="form-control" id="nombre">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="apellidos">Apellidos</label>
+                                <input formControlName="apellidos" type="text" class="form-control" id="apellidos">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="area">Area</label>
+                                <select formControlName="area" class="form-control" id="area">
+                                    <option [ngValue]="area" *ngFor="let area of listaArea">{{area.nombre}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="nomSolicitud">Nombre solicitud</label>
+                                <input formControlName="nomSolicitud" type="text" class="form-control"
+                                    id="nomSolicitud">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="descSolicitud">Descripción solicitud</label>
+                                <textarea formControlName="descSolicitud" class="form-control" id="descSolicitud"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="modificar()">Guardar</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
