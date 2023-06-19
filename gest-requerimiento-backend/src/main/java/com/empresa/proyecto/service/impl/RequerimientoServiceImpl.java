@@ -1,9 +1,17 @@
 package com.empresa.proyecto.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.empresa.proyecto.entity.OutResponse;
 import com.empresa.proyecto.entity.Requerimiento;
@@ -32,15 +40,35 @@ public class RequerimientoServiceImpl implements RequerimientoService {
 	}
 
 	@Override
-	public OutResponse<Requerimiento> guardar(Requerimiento req) {
+	public OutResponse<Requerimiento> guardar(Requerimiento req, MultipartFile file) {
 		log.info("[REGISTRAR REQUERIMIENTO][SERVICE][INICIO]");
 		OutResponse<Requerimiento> out = new OutResponse<>();
 
+		String url = saveFile(file);
+		req.setUrlAnexo(url);
 		requerimientoRepository.guardar(req);
 		out.setRobjeto(req);
 
 		log.info("[REGISTRAR REQUERIMIENTO][SERVICE][FIN]");
 		return out;
+	}
+
+	private String saveFile(MultipartFile file) {
+		String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss-"));
+		String fileName = date + file.getOriginalFilename();
+
+		String folderPath = "D:/archivos";
+		if (!new File(folderPath).exists()) {
+			new File(folderPath).mkdir();
+		}
+		String filePath = folderPath + File.separator + fileName;
+
+		try {
+			Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			log.info(e.getMessage());
+		}
+		return filePath;
 	}
 
 	@Override

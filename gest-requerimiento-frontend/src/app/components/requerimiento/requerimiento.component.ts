@@ -8,6 +8,7 @@ import { OutResponse } from 'src/app/dto/response/out.response';
 import { Requerimiento } from 'src/app/dto/response/requerimiento';
 import { AreaService } from 'src/app/services/area.service';
 import { RequerimientoService } from 'src/app/services/requerimiento.service';
+import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-requerimiento',
@@ -17,6 +18,8 @@ import { RequerimientoService } from 'src/app/services/requerimiento.service';
 export class RequerimientoComponent implements OnInit {
   @ViewChild('closebutton') closebutton;
   @ViewChild('closebutton2') closebutton2;
+
+  fileupload: any;
 
   listaArea: Area[] = [];
   listaRequerimiento: Requerimiento[] = [];
@@ -102,6 +105,7 @@ export class RequerimientoComponent implements OnInit {
   }
 
   buscar(): void {
+
     let nombres = this.formularioBuscarGrp.get('nombre').value;
     let apellidos = this.formularioBuscarGrp.get('apellidos').value;
     let descSolicitud = this.formularioBuscarGrp.get('descSolicitud').value;
@@ -117,6 +121,12 @@ export class RequerimientoComponent implements OnInit {
       },
       error => {
         console.log(error);
+        Swal.fire({
+          title: 'Error!',
+          text: error,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       }
     );
   }
@@ -131,7 +141,12 @@ export class RequerimientoComponent implements OnInit {
     req.flgActivo = 1;
     req.urlAnexo = 'url';
 
-    this.requerimientoService.guardar(req).subscribe(
+    const formData = new FormData();
+
+    formData.append("file", this.fileupload ? this.fileupload : null);
+    formData.append('data', JSON.stringify(req));
+
+    this.requerimientoService.guardar(formData).subscribe(
       (data: OutResponse<Requerimiento>) => {
         console.log(data);
         if (data.rcodigo == 0) {
@@ -139,31 +154,71 @@ export class RequerimientoComponent implements OnInit {
           this.listaRequerimiento.push(data.robjeto);
 
           this.closebutton.nativeElement.click();
+          Swal.fire({
+            text: data.rmensaje,
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          })
         } else {
           console.log(data.rmensaje);
+          Swal.fire({
+            text: data.rmensaje,
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+          })
         }
       },
       error => {
         console.log(error);
+        Swal.fire({
+          title: 'Error!',
+          text: error,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       }
     );
   }
 
   eliminar(req: Requerimiento): void {
-    this.requerimientoService.eliminar(req.id).subscribe(
-      (data: OutResponse<Requerimiento>) => {
-        console.log(data);
-        if (data.rcodigo == 0) {
-          let index = this.listaRequerimiento.indexOf(req);
-          this.listaRequerimiento.splice(index, 1);
-        } else {
-          console.log(data.rmensaje);
-        }
-      },
-      error => {
-        console.log(error);
+    Swal.fire({
+      title: '¿Esta seguro de eliminar el registro seleccionado?',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.requerimientoService.eliminar(req.id).subscribe(
+          (data: OutResponse<Requerimiento>) => {
+            console.log(data);
+            if (data.rcodigo == 0) {
+              let index = this.listaRequerimiento.indexOf(req);
+              this.listaRequerimiento.splice(index, 1);
+              Swal.fire({
+                text: data.rmensaje,
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+              })
+            } else {
+              console.log(data.rmensaje);
+              Swal.fire({
+                text: data.rmensaje,
+                icon: 'warning',
+                confirmButtonText: 'Aceptar'
+              })
+            }
+          },
+          error => {
+            console.log(error);
+            Swal.fire({
+              title: 'Error!',
+              text: error,
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            })
+          }
+        );
       }
-    );
+    })
   }
 
   modificarData(req: Requerimiento): void {
@@ -185,7 +240,6 @@ export class RequerimientoComponent implements OnInit {
     req.nomSolicitud = this.formularioModificarGrp.get('nomSolicitud').value;
     req.descSolicitud = this.formularioModificarGrp.get('descSolicitud').value;
     req.flgActivo = 1;
-    req.urlAnexo = 'url';
 
     this.requerimientoService.modificar(req, this.requerimientoMod.id).subscribe(
       (data: OutResponse<Requerimiento>) => {
@@ -194,16 +248,38 @@ export class RequerimientoComponent implements OnInit {
           let index = this.listaRequerimiento.indexOf(this.requerimientoMod);
 
           data.robjeto.nombreArea = this.formularioModificarGrp.get('area').value ? this.formularioModificarGrp.get('area').value.nombre : null;
+          data.robjeto.urlAnexo = this.requerimientoMod.urlAnexo;
           this.listaRequerimiento.splice(index, 1, data.robjeto);
 
           this.closebutton2.nativeElement.click();
+
+          Swal.fire({
+            text: data.rmensaje,
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          })
         } else {
           console.log(data.rmensaje);
+          Swal.fire({
+            text: data.rmensaje,
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+          })
         }
       },
       error => {
         console.log(error);
+        Swal.fire({
+          title: 'Error!',
+          text: error,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       }
     );
+  }
+
+  public cargarArchivoDocAdj(event) {
+    this.fileupload = event.target.files[0];
   }
 }

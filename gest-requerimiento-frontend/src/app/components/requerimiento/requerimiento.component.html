@@ -92,6 +92,7 @@
                             <div class="form-group">
                                 <label for="area">Area</label>
                                 <select formControlName="area" class="form-control" id="area">
+                                    <option value="" disabled selected hidden>Seleccione</option>
                                     <option [ngValue]="area" *ngFor="let area of listaArea">{{area.nombre}}
                                     </option>
                                 </select>
@@ -114,7 +115,8 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="anexo">Anexo</label>
-                                <input type="file" class="form-control-file" id="anexo">
+                                <input type="file" class="form-control-file" accept="application/pdf" id="anexo"
+                                    (change)="cargarArchivoDocAdj($event)" multiple="false">
                             </div>
                         </div>
                     </div>
@@ -156,6 +158,7 @@
                             <div class="form-group">
                                 <label for="area">Area</label>
                                 <select formControlName="area" class="form-control" id="area">
+                                    <option value="" disabled selected hidden>Seleccione</option>
                                     <option [ngValue]="area" *ngFor="let area of listaArea">{{area.nombre}}
                                     </option>
                                 </select>

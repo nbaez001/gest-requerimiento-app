@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.empresa.proyecto.entity.OutResponse;
 import com.empresa.proyecto.entity.Requerimiento;
 import com.empresa.proyecto.service.RequerimientoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,9 +43,23 @@ public class RequerimientoController {
 	}
 
 	@PostMapping
-	public OutResponse<Requerimiento> guardar(@RequestBody Requerimiento req) {
+	public OutResponse<Requerimiento> guardar(@RequestParam("data") String data,
+			@RequestParam(value = "file", required = false) MultipartFile file) {
 		log.info("[REGISTRAR REQUERIMIENTO][CONTROLLER][INICIO]");
-		OutResponse<Requerimiento> out = requerimientoService.guardar(req);
+		OutResponse<Requerimiento> out = new OutResponse<>();
+		try {
+			ObjectMapper om = new ObjectMapper();
+			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			Requerimiento req = om.readValue(data, new TypeReference<Requerimiento>() {
+			});
+
+			out = requerimientoService.guardar(req, file);
+		} catch (JsonProcessingException e) {
+			log.info(e.getMessage());
+			out.setRcodigo(500);
+			out.setRmensaje(e.getMessage());
+		}
+
 		log.info("[REGISTRAR REQUERIMIENTO][CONTROLLER][FIN]");
 		return out;
 	}

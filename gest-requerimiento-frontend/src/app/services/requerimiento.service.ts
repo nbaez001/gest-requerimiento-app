@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -14,8 +14,10 @@ export class RequerimientoService {
     return this.http.get<OutResponse<Requerimiento[]>>(`${environment.gestReqBackendUrl}/requerimiento?${nombre ? 'nombre=' + nombre : ''}${apellidos ? 'apellidos=' + apellidos : ''}${nomSolicitud ? 'nomSolicitud=' + nomSolicitud : ''}`);
   }
 
-  public guardar(req: Requerimiento): Observable<OutResponse<Requerimiento>> {
-    return this.http.post<OutResponse<Requerimiento>>(`${environment.gestReqBackendUrl}/requerimiento`, req);
+  public guardar(req: FormData): Observable<OutResponse<Requerimiento>> {
+    const headers = new HttpHeaders();
+    headers.set('Accept', 'application/json');
+    return this.http.post<OutResponse<Requerimiento>>(`${environment.gestReqBackendUrl}/requerimiento`, req, { headers });
   }
 
   public modificar(req: Requerimiento, id: number): Observable<OutResponse<Requerimiento>> {
