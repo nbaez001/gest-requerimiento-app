@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.empresa.proyecto.repository.RequerimientoRepository">
+
+	<select id="listar"
+		resultType="com.empresa.proyecto.entity.Requerimiento">
+		SELECT 
+		r.id as id, 
+		r.id_area as idArea, 
+		r.nombre as nombre, 
+		r.apellidos as apellidos,
+		r.nom_solicitud as nomSolicitud, 
+		r.desc_solicitud as descSolicitud,
+		r.desc_solicitud as descSolicitud,
+		r.url_anexo as urlAnexo
+		FROM requerimiento r
+		<where>
+			<if test="nombre != null">
+				<bind name="pattern" value="'%' + nombre + '%'" />
+				AND r.nombre LIKE #{pattern}
+			</if>
+			<if test="apellidos != null">
+				<bind name="pattern2" value="'%' + apellidos + '%'" />
+				AND r.apellidos LIKE #{pattern2}
+			</if>
+			<if test="nomSolicitud != null">
+				<bind name="pattern3" value="'%' + nomSolicitud + '%'" />
+				AND r.nom_solicitud LIKE #{pattern3}
+			</if>
+		</where>
+	</select>
+	
+	<select id="guardar" resultType="java.lang.Long">
+		INSERT INTO requerimiento(
+		id_area, 
+		nombre, 
+		apellidos, 
+		nom_solicitud, 
+		desc_solicitud, 
+		url_anexo, 
+		flg_activo, 
+		id_usu_crea, 
+		fec_usu_crea)
+		VALUES(
+		#{idArea,jdbcType=INTEGER},
+		#{nombre,jdbcType=VARCHAR},
+		#{apellidos,jdbcType=VARCHAR},
+		#{nomSolicitud,jdbcType=VARCHAR},
+		#{descSolicitud,jdbcType=VARCHAR},
+		#{urlAnexo,jdbcType=VARCHAR},
+		1,
+		1,
+		now())
+		RETURNING id
+	</select>
+	
+	<update id="modificar">
+		UPDATE requerimiento SET
+		id_area = #{idArea,jdbcType=INTEGER},
+		nombre = #{nombre,jdbcType=VARCHAR},
+		apellidos = #{apellidos,jdbcType=VARCHAR},
+		nom_solicitud = #{nomSolicitud,jdbcType=VARCHAR},
+		desc_solicitud = #{descSolicitud,jdbcType=VARCHAR},
+		url_anexo = #{urlAnexo,jdbcType=VARCHAR},
+		flg_activo = 1,
+		id_usu_mod = 1,
+		fec_usu_mod = now()
+		WHERE id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<delete id="eliminar" parameterType="java.lang.Integer">
+    	DELETE FROM requerimiento
+    	WHERE id = #{id}
+    </delete>
+</mapper>
