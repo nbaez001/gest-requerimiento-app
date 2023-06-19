@@ -8,12 +8,14 @@ import { AyudaComponent } from './components/ayuda/ayuda.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedService } from './services/shared.service';
+import { AyudaDescripcionComponent } from './components/ayuda/ayuda-descripcion/ayuda-descripcion.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RequerimientoComponent,
-    AyudaComponent
+    AyudaComponent,
+    AyudaDescripcionComponent
   ],
   imports: [
     BrowserModule,

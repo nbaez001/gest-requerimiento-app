@@ -1,1 +1,20 @@
-<p>ayuda works!</p>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="area">Tipo requerimiento</label>
+                <select [(ngModel)]="tipoRequerimientoPadre" class="form-control" id="area">
+                    <option [ngValue]="tipo" *ngFor="let tipo of listaTipoRequerimiento">{{tipo.nombre}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-12 mt-3">
+            <div class="form-group">
+                <app-ayuda-descripcion [tipoRequerimiento]="tipoRequerimientoPadre"></app-ayuda-descripcion>
+            </div>
+        </div>
+        
+    </div>
+</div>
